@@ -1,29 +1,18 @@
-haskell-style-guide
-===================
+# haskell-style-guide
 
-A document describing how I like Haskell code to be written. This is
-how I write my code and expect code submitted to my projects to be
-in. I'll probably link this to you if I don't sound particularly happy
-with a patch you sent me.
-
-This style guide is formally encoded by the [hindent](https://github.com/chrisdone/hindent) 
-tool in the `chris-done` style, which I use for all the code I write.
-
-This guide is also very easy to follow when you have an editor like
-Emacs with
-[structured-haskell-mode](https://github.com/chrisdone/structured-haskell-mode),
-which opinionatedly applies this style guide automatically.
+This is forked from
+[Chris Done's style guide](https://github.com/chrisdone/haskell-style-guide).
 
 ## Indentation
 
-Indent two spaces. No tabs. 
+Indent two spaces. No tabs.
 
 ## Line length
 
-Prefer 80 columns, but don't waste your time re-working code just to
-fit within it. There, 120 is acceptable too. Don't try to shoehorn
-code that shouldn't be broken up (like long strings) onto multiple
-lines. Let them be.
+Prefer 80 columns, but don't waste your time re-working code just to fit
+within it. There, 120 is acceptable too. Don't try to shoehorn code that
+shouldn't be broken up (like long strings) onto multiple lines. Let them
+be.
 
 ## Modules
 
@@ -44,10 +33,10 @@ coming on the line after.
 
 ``` haskell
 module Foo
-  (a
-  ,b
-  ,c)
-  where
+       ( a
+       , b
+       , c
+       ) where
 ```
 
 ## Imports
@@ -88,16 +77,9 @@ import X (foo,bar)
 And if they don't fit on one line, like this:
 
 ``` haskell
-import X (foo
-         ,bar)
-```
-
-But prefer that if you have more than one, instead use separate import
-lines:
-
-``` haskell
-import X (foo)
-import X (bar)
+import X ( foo
+         , bar
+         )
 ```
 
 If you have many imports, prefer explicit qualification:
@@ -120,16 +102,6 @@ Unless they overlap, in which case it will be `T.Text`.
 All declarations should be surrounded by a blank line. Declarations
 should not have blank lines in them. If your code is so complicated,
 split it up into names.
-
-Always order declarations in the order that they're used, top-down:
-
-``` haskell
-main = foo bar
-
-foo = bob
-
-bar = zot
-```
 
 Always add type-signatures to top-level functions once they are
 written, and document them:
@@ -196,10 +168,9 @@ document data types. Always put parentheses around derivings.
 
 ``` haskell
 -- | Lorem ipsum amet patate.
-data Foo
-  = X
-  | Y
-  | Z
+data Foo = X
+         | Y
+         | Z
   deriving (A)
 ```
 
@@ -207,11 +178,10 @@ Always layout non-sum record types like this, and document the fields.
 
 ``` haskell
 -- | Some record type.
-data Foo = Foo
-  { fooBar :: X -- ^ Bar stuff.
-  , fooMu  :: Y -- ^ Mu stuff.
-  , fooZot :: Z -- ^ Zot stuff.
-  }
+data Foo = Foo { fooBar :: X -- ^ Bar stuff.
+               , fooMu  :: Y -- ^ Mu stuff.
+               , fooZot :: Z -- ^ Zot stuff.
+               }
   deriving (B)
 ```
 
@@ -228,14 +198,6 @@ Or:
 ``` haskell
 parent child1
        child2
-```
-
-Or, when preferred, due to line length constraints:
-
-``` haskell
-parent
-  child1
-  child2
 ```
 
 Never mix and match single-line versus multi-line:
@@ -268,9 +230,9 @@ case x of
 case y of
   X a
     | p x ->
-      bob foo
+        bob foo
     | otherwise ->
-      gogo gadget
+        gogo gadget
 
 \x y ->
   z y
@@ -342,35 +304,11 @@ len = length <$> getline
 demo = _1 -- whatever the lens operator is to do `over'
 ```
 
-Never use `($)` to avoid parentheses:
-
-``` haskell
-len = foo $ bar mu zot
-len = foo (bar mu zot)
-
-fork = forkIO $ do go go
-fork = forkIO (do go go)
-```
-
 Always space out multi-operator expressions:
 
 ``` haskell
 foo = x y * z * y
 ```
-
-If you can't resist using `($)`, never mix it with `(.)` like this:
-
-``` haskell
-foo = foo . bar . mu $ zot bob
-```
-
-Use parens:
-
-``` haskell
-foo = (foo . bar . mu) zot bob
-```
-
-(Tee hee!)
 
 ## Composition
 
@@ -434,19 +372,6 @@ main = do a <- return 1
           print y
 ```
 
-When in a `do`, `let … in` must be laid out differently:
-
-``` haskell
-main = do a <- return 1
-          let x = 123
-              y = x * a
-              in print (x * y)
-          print y
-```
-
-Align the `in` with the other children, like in `if … then … else`
-syntax.
-
 ## Salvaging space
 
 First, write your code on the same line as the parent:
@@ -476,39 +401,41 @@ fooBarMu =
 
 ## Collections
 
-Write tuples, lists and records without spaces:
+Write tuples, lists and records with spaces:
 
 ``` haskell
-(a,b,c)
+(a, b, c)
 
-[a,b,c]
+[a, b, c]
 
-{x = a,y = b,z = c}
+{x=a, y=b, z=c}
 ```
 
 Layout multi-line tuples, lists and records with prefix comma:
 
 ``` haskell
-(a
-,b
-,c)
+( a
+, b
+, c
+)
 
-[a
-,b
-,c]
+[ a
+, b
+, c
+]
 
-{x = a
-,y = b
-,z = c}
+{ x = a
+, y = b
+, z = c
+}
 ```
 
 # If
 
-*Always* line up `then` and `else` with the condition when laying out `if` on multiple
-lines:
+Add two spaces for the `then` and `else` clauses
 
 ``` haskell
 if x
-   then y
-   else x
+  then y
+  else x
 ```
