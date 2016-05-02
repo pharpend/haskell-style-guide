@@ -3,10 +3,122 @@
 This is forked from
 [Chris Done's style guide](https://github.com/chrisdone/haskell-style-guide).
 
-## Indentation
+## Indentation and Alignment
 
-Indent two spaces. No tabs.
+Indentation should be two spaces. Do **not** use tabulator characters.
 
+```haskell
+case x of
+  foo -> bar
+  quux -> quuz
+```
+
+`do`-blocks should be lined up like this:
+
+```haskell
+j = do foo bar baz
+       quux jyty arouo
+       return ()
+```
+
+If the left-hand-side (LHS) is reasonably long, as will usually be the
+case, do this instead:
+
+```haskell
+someObscenelyLongFunctionName =
+  do foo bar baz
+     quux jyty arouo
+     return ()
+```
+
+Do **not** line up arrows like this:
+
+```haskell
+do foo     <- bar baz quux
+   Tim bob <- quuz
+   return foo
+```
+
+or like this
+
+```haskell
+case x of
+  Left foo  -> 1
+  Right bar -> 2
+```
+
+It ends up polluting diffs.
+
+## Naming functions
+
+Functions should be named using the `camelCaseConvention`. Do not use
+`snake_case`.
+
+## Grammar of binary operators
+
+English is a Subject-Verb-Object (SVO) language. If you are writing a
+binary operator, it needs to make sense as the verb. If the binary
+operator is used in prefix format, it should be VSO, or
+Verb-Subject-Object.
+
+```haskell
+verb :: Subject -> Object -> Result
+```
+
+That way, if the operator is used in infix form, we'd have
+
+```haskell
+subject `verb` object
+```
+
+#### Examples
+
+1. In the simplest case, let's take a verb that takes an indeterminate
+   direct object.
+
+   ```haskell
+   shot :: Person -> Person -> Death
+   ```
+
+   The SVO rule states that it has to make sense (in English) to write
+
+   ```haskell
+   i `shot` derek
+   ```
+
+   In this case, `i` is the subject, `shot` is the verb, and `derek` is the
+   direct object. This makes no sense in English:
+
+   ```haskell
+   derek `shot` i
+   ```
+   That is an example of Object-Verb-Subject grammar. English is an SVO
+   language, so write your binary operators so they make sense in VSO or
+   SVO format.
+
+   Haskell supports prefix and infix operators. It does not support
+   suffix operators. If there ever comes a time where Haskell does
+   support suffix operators, please write your binary operators in SOV
+   form.
+
+2. If your operator has a preposition in it, or if either the subject or
+   the object is determinate, this should be even more obvious.
+
+   ```haskell
+   wentTo :: Subject -> Destination -> Result
+   ```
+
+   This makes sense:
+
+   ```haskell
+   i `wentTo` theStore
+   ```
+
+   This does not
+
+   ```haskell
+   theStore `wentTo` i
+   ```
 ## Line length
 
 Prefer 80 columns, but don't waste your time re-working code just to fit
@@ -20,13 +132,12 @@ Always document the module header:
 
 ``` haskell
 -- | What this module does.
-
 module Foo where
 ```
 
 Put the `where` on the same line unless there are exports.
 
-## Exports
+### Exports
 
 If there are exports then write them like this, with the `where`
 coming on the line after.
@@ -68,10 +179,26 @@ import System.IO
 import System.Process
 ```
 
+If you have qualified imports, align the rest of your imports accordingly.
+
+``` haskell
+module Foo.Bar where
+
+import Foo.Zot
+import Foo.Bob
+
+import           Control.Monad
+import qualified Data.Text as T
+import           Data.List
+import           Data.Maybe
+import           System.IO
+import           System.Process
+```
+
 Write import lists like this:
 
 ``` haskell
-import X (foo,bar)
+import X (foo, bar)
 ```
 
 And if they don't fit on one line, like this:
@@ -91,8 +218,8 @@ import qualified X as Z
 Prefer to import types unqualified:
 
 ``` haskell
+import           Data.Text (Text)
 import qualified Data.Text as T
-import Data.Text (Text)
 ```
 
 Unless they overlap, in which case it will be `T.Text`.
@@ -138,9 +265,10 @@ This is improved by:
 main =
   do openConnection
      makeCake
-  where openConnection = foo bar y …
-        makeCake = zot bob y …
-        y = z * zz
+  where
+    openConnection = foo bar y …
+    makeCake = zot bob y …
+    y = z * zz
 ```
 
 This better documents what the function is doing.
@@ -164,7 +292,7 @@ context.
 ## Data types
 
 Always layout sum types so that the `=` and `|` line up. Always
-document data types. Always put parentheses around derivings.
+document data types. Always put parentheses around `deriving`s.
 
 ``` haskell
 -- | Lorem ipsum amet patate.
@@ -288,28 +416,6 @@ Not
 main = bar >> mu
 ```
 
-## Operators
-
-Never use operators when a simple English name is provided:
-
-``` haskell
-len = fmap length getLine
-demo = over _1 (+2) (5,4)
-```
-
-Not:
-
-``` haskell
-len = length <$> getline
-demo = _1 -- whatever the lens operator is to do `over'
-```
-
-Always space out multi-operator expressions:
-
-``` haskell
-foo = x y * z * y
-```
-
 ## Composition
 
 Prefer to use composition where functions are expected, not
@@ -336,40 +442,20 @@ Always indent where clauses two spaces:
 main =
   do hello
      world
-  where go = print "Hello!"
-```
-
-Sometimes it's okay to also put a newline after the where and indent:
-
-``` haskell
-main = go
-  where
+  where 
     go = print "Hello!"
+    blah = x go
+    ...
 ```
 
-## Let expressions
-
-Never use let-expressions in a right-hand-side:
-
-``` haskell
-main = let x = y
-       in x
-```
-
-Instead prefer a `where`:
+If you only have one function in the `where`, then something like this
+is fine
 
 ``` haskell
-main = x
-  where x = y
-```
-
-Write `let` expressions inside a `do` in a bottom-up style:
-
-``` haskell
-main = do a <- return 1
-          let x = 123
-              y = x * a
-          print y
+main =
+  do hello
+     world
+  where go = print "Hello!"
 ```
 
 ## Salvaging space
@@ -407,7 +493,12 @@ Write tuples, lists and records with spaces:
 (a, b, c)
 
 [a, b, c]
+```
 
+Note that if your list contains operators, try to group the elements
+such that the operator does not have surrounding space:
+
+```haskell
 {x=a, y=b, z=c}
 ```
 
